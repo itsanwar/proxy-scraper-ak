@@ -9,8 +9,8 @@ export default async function checkProxy({ proxy, timeoutMs, targets, protocol =
     const checkSocks5 = p === 'all' || p === 'socks5';
     const checkSocks4 = p === 'all' || p === 'socks4';
     const httpAgent = {
-        http: new HttpProxyAgent({ proxy: `http://${proxy}`, keepAlive: true, keepAliveMsecs: 1000, timeout: timeoutMs }),
-        https: new HttpsProxyAgent({ proxy: `http://${proxy}`, keepAlive: true, keepAliveMsecs: 1000, timeout: timeoutMs })
+        http: new HttpProxyAgent({ proxy: `http://${proxy}`, timeout: timeoutMs }),
+        https: new HttpsProxyAgent({ proxy: `http://${proxy}`, timeout: timeoutMs })
     };
 
     const socks5Agent = {

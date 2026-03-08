@@ -157,7 +157,9 @@ function render() {
             sLine += '\n';
             const displayErrors = state.errors.slice(-3);
             displayErrors.forEach((err) => {
-                sLine += chalk.red(`     └─ Error: ${err.message}`) + '\n';
+                let msg = err.message.replace(/\r?\n|\r/g, ' '); // Strip physical newlines
+                if (msg.length > 80) msg = msg.substring(0, 77) + '...'; // Clamp string to prevent visual line wrap
+                sLine += chalk.red(`     └─ Error: ${msg}`) + '\n';
             });
             if (state.errors.length > 3) {
                 sLine += chalk.dim(`     └─ ...and ${state.errors.length - 3} more errors (see logs/)`);

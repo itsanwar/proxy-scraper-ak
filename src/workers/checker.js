@@ -29,17 +29,15 @@ export default async function checkProxy({ proxy, timeoutMs, targets, protocol =
             await got(url, {
                 agent: agentObj,
                 timeout: {
-                    lookup: timeoutMs,
-                    connect: timeoutMs,
-                    secureConnect: timeoutMs,
-                    socket: timeoutMs,
-                    response: timeoutMs
+                    request: timeoutMs
                 },
                 retry: { limit: 0 },
+                throwHttpErrors: false,
                 https: { rejectUnauthorized: false }
             });
             return { valid: true, protocol, latency: Date.now() - start };
         } catch (err) {
+            // Either the connection timed out, was refused, or the proxy is dead
             return { valid: false };
         }
     };

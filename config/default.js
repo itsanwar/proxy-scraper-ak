@@ -24,11 +24,9 @@ export default {
         checkTimeoutMs: 7000,
         // Max parallel proxy tests
         checkConcurrency: 800,
-        // URLs used to test standard internet connectivity 
+        // URLs used to test standard internet connectivity (Single target drastically speeds up Thread checks)
         validationTargets: [
-            "http://1.1.1.1",
-            "http://8.8.8.8",
-            "http://www.google.com"
+            "http://1.1.1.1"
         ]
     },
     output: {

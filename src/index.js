@@ -22,6 +22,7 @@ program
     .option('-w, --workers <number>', 'Number of validation worker threads (default: system logical threads)')
     .option('-t, --timeout <number>', 'Timeout per request in milliseconds (default: 5000)')
     .option('-p, --protocol <type>', 'Specific protocol to check (http, https, socks4, socks5, all) (default: all)')
+    .option('-o, --output <path>', 'Custom directory to save validated proxies (default: "sproxies")')
     .option('-l, --loop', 'Run the scraper in an infinite loop (default: false)')
     .option('--nocache', 'Disable scraping cache to force fresh fetches on every loop')
     .addHelpText('after', `
@@ -42,6 +43,7 @@ if (options.workers) config.validation.workerCount = parseInt(options.workers, 1
 if (options.protocol) config.validation.checkProtocol = options.protocol.toLowerCase();
 if (options.loop) config.engine.loop = true;
 if (options.nocache) config.engine.noCache = true;
+if (options.output) config.output.folderName = options.output;
 if (options.timeout) {
     const tMs = parseInt(options.timeout, 10);
     config.engine.scrapeTimeoutMs = tMs;

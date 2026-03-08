@@ -59,6 +59,7 @@ Options:
   -w, --workers <number>     Number of Pico CPU worker threads to utilize for validation (default: your system CPU count)
   -t, --timeout <ms>         Validation socket timeout in milliseconds (default: 7000)
   -p, --protocol <type>      Force strictly ONE protocol check to massively speed up yields. (Choices: "all", "http", "https", "socks4", "socks5" | default: "all")
+  -o, --output <path>        Custom directory path to save validated proxies (default: "sproxies")
   -l, --loop                 Enable infinite looping mode. Automatically restarts scraping endlessly.
   --nocache                  Bypass source cache and force raw HTTP fetching on every cycle.
   -h, --help                 Display all available commands.
@@ -73,9 +74,9 @@ akscraper -s sources.txt -p http -w 80
 ```
 
 **The "Infini-Bot" Setup:**
-Force the scraper to run indefinitely in an endless loop, clearing its physical cache map on every single iteration to ensure the freshest proxies are constantly piped into your `sproxies/` output architecture.
+Force the scraper to run indefinitely in an endless loop, clearing its physical cache map on every single iteration to ensure the freshest proxies are constantly piped into your targeted server export layout architecture.
 ```bash
-akscraper -s links.txt -l --nocache
+akscraper -s links.txt -o ./production_proxies -l --nocache
 ```
 
 ---

@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+/node_modules
+
+# Production files
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.pnpm-store
+
+# Environment variables
+.env
+.env.development
+.env.production
+
+# Build artifacts
+dist
+build
+.next # For Next.js projects
+.nuxt # For Nuxt.js projects
+.output # For Nuxt.js projects
+
+# IDE and OS files
+.vscode
+.idea
+.DS_Store # macOS
+npm-shrinkwrap.json # if you don't use it
+
+logs/*
+sproxies/*

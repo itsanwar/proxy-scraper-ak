@@ -1,0 +1,40 @@
+{
+  "name": "proxy-scraper-ak",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "akscraper": "./src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsanwar/proxy-scraper-ak.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/itsanwar/proxy-scraper-ak/issues"
+  },
+  "homepage": "https://github.com/itsanwar/proxy-scraper-ak#readme",
+  "type": "module",
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "chalk": "^5.6.2",
+    "cli-spinners": "^3.4.0",
+    "commander": "^14.0.3",
+    "got": "^14.6.6",
+    "gradient-string": "^3.0.0",
+    "hpagent": "^1.2.0",
+    "log-update": "^7.2.0",
+    "maxmind": "^5.0.5",
+    "p-map": "^7.0.4",
+    "pino": "^10.3.1",
+    "piscina": "^5.1.4",
+    "socks-proxy-agent": "^8.0.5",
+    "string-width": "^8.2.0"
+  }
+}

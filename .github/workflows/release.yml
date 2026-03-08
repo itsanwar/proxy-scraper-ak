@@ -1,9 +1,12 @@
 name: Cross-Platform Build & Release
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
-      - 'v*' # Triggers automatically when pushing tags (e.g., git tag v1.0.0; git push origin v1.0.0)
+      - "v*" # Triggers automatically when pushing tags (e.g., git tag v1.0.0; git push origin v1.0.0)
   workflow_dispatch: # Allows manual trigger from the Actions tab
 
 jobs:
@@ -35,7 +38,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Dependencies
         run: npm ci

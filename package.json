@@ -8,9 +8,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:windows": "caxa -i . -m \"Extracting Proxy Scraper...\" -e \"node {{caxa}}/src/index.js\" -o akscraper-windows.exe",
-    "build:linux": "caxa -i . -m \"Extracting Proxy Scraper...\" -e \"node {{caxa}}/src/index.js\" -o akscraper-linux",
-    "build:macos": "caxa -i . -m \"Extracting Proxy Scraper...\" -e \"node {{caxa}}/src/index.js\" -o akscraper-macos"
+    "build:windows": "caxa -i . -m \"Extracting Proxy Scraper...\" -o akscraper-windows.exe -- \"{{caxa}}/node_modules/.bin/node\" \"{{caxa}}/src/index.js\"",
+    "build:linux": "caxa -i . -m \"Extracting Proxy Scraper...\" -o akscraper-linux -- \"{{caxa}}/node_modules/.bin/node\" \"{{caxa}}/src/index.js\"",
+    "build:macos": "caxa -i . -m \"Extracting Proxy Scraper...\" -o akscraper-macos -- \"{{caxa}}/node_modules/.bin/node\" \"{{caxa}}/src/index.js\""
   },
   "repository": {
     "type": "git",

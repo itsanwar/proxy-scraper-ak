@@ -33,7 +33,11 @@ export default async function checkProxy({ proxy, timeoutMs, targets, protocol =
                 },
                 retry: { limit: 0 },
                 throwHttpErrors: false,
-                https: { rejectUnauthorized: false }
+                https: { rejectUnauthorized: false },
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Connection': 'close'
+                }
             });
             return { valid: true, protocol, latency: Date.now() - start };
         } catch (err) {
@@ -42,25 +46,25 @@ export default async function checkProxy({ proxy, timeoutMs, targets, protocol =
         }
     };
 
-    // Test across targets
-    for (const url of targets) {
-        if (checkHttp) {
-            // Test HTTP first 
-            let result = await testProtocol(httpAgent, 'HTTP', url);
-            if (result.valid) return { proxy, ...result };
-        }
+    // Select a single random target to completely bypass rate-limiting
+    const url = targets[Math.floor(Math.random() * targets.length)];
 
-        if (checkSocks5) {
-            // Test SOCKS5
-            let result = await testProtocol(socks5Agent, 'SOCKS5', url);
-            if (result.valid) return { proxy, ...result };
-        }
+    if (checkHttp) {
+        // Test HTTP first 
+        let result = await testProtocol(httpAgent, 'HTTP', url);
+        if (result.valid) return { proxy, ...result };
+    }
 
-        if (checkSocks4) {
-            // Test SOCKS4
-            let result = await testProtocol(socks4Agent, 'SOCKS4', url);
-            if (result.valid) return { proxy, ...result };
-        }
+    if (checkSocks5) {
+        // Test SOCKS5
+        let result = await testProtocol(socks5Agent, 'SOCKS5', url);
+        if (result.valid) return { proxy, ...result };
+    }
+
+    if (checkSocks4) {
+        // Test SOCKS4
+        let result = await testProtocol(socks4Agent, 'SOCKS4', url);
+        if (result.valid) return { proxy, ...result };
     }
 
     return { proxy, valid: false };

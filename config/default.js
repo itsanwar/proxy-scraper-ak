@@ -24,9 +24,12 @@ export default {
         checkTimeoutMs: 7000,
         // Max parallel proxy tests
         checkConcurrency: 800,
-        // URLs used to test standard internet connectivity (Single target drastically speeds up Thread checks)
+        // Highly-available Captive Portal endpoints (Used to completely bypass IP-based rate limiting)
         validationTargets: [
-            "http://1.1.1.1"
+            "http://clients3.google.com/generate_204",
+            "http://captive.apple.com/hotspot-detect.html",
+            "http://cp.cloudflare.com/generate_204",
+            "http://edge-mqtt.facebook.com/captive_return"
         ]
     },
     output: {

@@ -7,7 +7,10 @@
     "akscraper": "./src/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:windows": "caxa -i . -m \"Extracting Proxy Scraper...\" -e \"node {{caxa}}/src/index.js\" -o akscraper-windows.exe",
+    "build:linux": "caxa -i . -m \"Extracting Proxy Scraper...\" -e \"node {{caxa}}/src/index.js\" -o akscraper-linux",
+    "build:macos": "caxa -i . -m \"Extracting Proxy Scraper...\" -e \"node {{caxa}}/src/index.js\" -o akscraper-macos"
   },
   "repository": {
     "type": "git",
@@ -36,5 +39,8 @@
     "piscina": "^5.1.4",
     "socks-proxy-agent": "^8.0.5",
     "string-width": "^8.2.0"
+  },
+  "devDependencies": {
+    "caxa": "^3.0.1"
   }
 }

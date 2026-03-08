@@ -95,6 +95,19 @@ const titleGradient = gradient(['#f3a183', '#ec6f66']);
 const scrapeGradient = gradient(['#f3a183', '#ec6f66']);
 const validateGradient = gradient(['#ec6f66', '#f3a183']);
 
+function formatTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+        return `${hours} hours ${minutes} minutes ${seconds} seconds`;
+    } else if (minutes > 0) {
+        return `${minutes} mins ${seconds} seconds`;
+    }
+    return `${seconds} seconds`;
+}
+
 function getBar(current, total, width = 30, gradientTheme) {
     if (total === 0) return chalk.gray('─'.repeat(width));
     const percent = Math.min(1, Math.max(0, current / total));
@@ -199,15 +212,15 @@ function render() {
 
     // Status Footer
     const elapsed = Math.floor(((state.times.totalEnd || Date.now()) - state.times.totalStart) / 1000);
-    output += `\n  ⏱  Elapsed Time: ${elapsed}s | Phase: ${chalk.italic(state.phase)}`;
+    output += `\n  ${chalk.gray('Elapsed Time:')} ${formatTime(elapsed)} ${chalk.dim('|')} ${chalk.gray('Phase:')} ${chalk.italic(state.phase)}`;
 
     if (state.phase === 'Done' && state.finalDir) {
-        const titleStr = chalk.bold('Scrape Complete');
+        const titleStr = scrapeGradient(' Scrape Complete ');
 
         let statsContent = '';
-        statsContent += chalk.green(`✔ Final Count: ${chalk.bold(state.validate.alive)} proxies\n`);
-        statsContent += chalk.blue(`⏱ Total Time:  ${elapsed}s\n`);
-        statsContent += chalk.magenta(`📁 Directory:  ${state.finalDir}`);
+        statsContent += `  ${chalk.gray('Final Count:')}   ${chalk.green.bold(state.validate.alive + ' proxies')}\n`;
+        statsContent += `  ${chalk.gray('Total Time:')}    ${chalk.blue(formatTime(elapsed))}\n`;
+        statsContent += `  ${chalk.gray('Directory:')}     ${chalk.magenta(state.finalDir)}`;
 
         output += '\n\n' + boxen(statsContent, {
             title: titleStr,

@@ -1,25 +1,31 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import maxmind from 'maxmind';
 import config from '../../config/default.js';
 import { logger } from '../utils/logger.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '../../');
 
 export class ProxyPipeline {
     constructor() {
         this.outputDir = path.resolve(process.cwd(), config.output.folderName);
         this.lookup = null;
+        this.resolvedGeoDbPath = path.resolve(projectRoot, config.output.geoDbPath);
     }
 
     async initGeoIP() {
-        if (config.output.filterByCountry && fs.existsSync(config.output.geoDbPath)) {
+        if (config.output.filterByCountry && fs.existsSync(this.resolvedGeoDbPath)) {
             try {
-                this.lookup = await maxmind.open(config.output.geoDbPath);
+                this.lookup = await maxmind.open(this.resolvedGeoDbPath);
                 logger.info('[Pipeline] GeoIP database loaded successfully.');
             } catch (err) {
                 logger.warn(`[Pipeline] Failed to load GeoIP db: ${err.message}`);
             }
         } else if (config.output.filterByCountry) {
-            logger.warn('[Pipeline] GeoIP database not found at path: ' + config.output.geoDbPath);
+            logger.warn('[Pipeline] GeoIP database not found at path: ' + this.resolvedGeoDbPath);
         }
     }
 

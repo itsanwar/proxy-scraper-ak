@@ -22,6 +22,12 @@ export class ProxyValidator {
         const validProxies = [];
         onProgress?.(completed, proxies.length, alive, dead);
 
+        // Fisher-Yates array shuffle to evenly distribute alive hits organically across the visual progress bar
+        for (let i = proxies.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [proxies[i], proxies[j]] = [proxies[j], proxies[i]];
+        }
+
         await pMap(proxies, async (proxy) => {
             let result = { valid: false };
             try {

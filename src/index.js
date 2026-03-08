@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+process.env.UV_THREADPOOL_SIZE = Math.max(128, parseInt(process.env.UV_THREADPOOL_SIZE || '128', 10)).toString();
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
@@ -19,6 +20,7 @@ program
     .version('2.0.0')
     .option('-s, --sources <path>', 'Path to sources file (.txt or .json)', 'config/sources.json')
     .option('-c, --concurrency <number>', 'Concurrent sources to scrape simultaneously (default: 20)')
+    .option('-v, --vconcurrency <number>', 'Concurrent proxies to validate simultaneously (default: 800)')
     .option('-w, --workers <number>', 'Number of validation worker threads (default: system logical threads)')
     .option('-t, --timeout <number>', 'Timeout per request in milliseconds (default: 5000)')
     .option('-p, --protocol <type>', 'Specific protocol to check (http, https, socks4, socks5, all) (default: all)')
@@ -39,6 +41,7 @@ program.parse();
 const options = program.opts();
 
 if (options.concurrency) config.engine.scrapingConcurrency = parseInt(options.concurrency, 10);
+if (options.vconcurrency) config.validation.checkConcurrency = parseInt(options.vconcurrency, 10);
 if (options.workers) config.validation.workerCount = parseInt(options.workers, 10);
 if (options.protocol) config.validation.checkProtocol = options.protocol.toLowerCase();
 if (options.loop) config.engine.loop = true;
@@ -126,6 +129,13 @@ function render() {
 
     let output = '\n';
     output += chalk.bold(titleGradient('✴  Powerful Proxy Scraper ✴ ')) + chalk.dim(' By @itsanwar\n');
+    output += chalk.dim('─────────────────────────────────────────────────────────────\n');
+
+    const protoCfg = config.validation.checkProtocol.toUpperCase();
+    const workCfg = config.validation.workerCount;
+    const vConcCfg = config.validation.checkConcurrency;
+    const timeCfg = config.validation.checkTimeoutMs + 'ms';
+    output += `   ${chalk.cyan('Protocol:')} ${chalk.white(protoCfg)} ${chalk.dim('•')} ${chalk.cyan('Workers:')} ${chalk.white(workCfg)} ${chalk.dim('•')} ${chalk.cyan('Val Conc:')} ${chalk.white(vConcCfg)} ${chalk.dim('•')} ${chalk.cyan('Timeout:')} ${chalk.white(timeCfg)}\n`;
     output += chalk.dim('─────────────────────────────────────────────────────────────\n\n');
 
     if (state.fatalError) {

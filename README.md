@@ -56,6 +56,7 @@ Usage: akscraper [options]
 Options:
   -s, --sources <path>       Path to the text file containing raw URLs to scrape (default: "links.txt")
   -c, --concurrency <number> Maximum concurrent fetch requests to scraping sources (default: 20)
+  -v, --vconcurrency <num>   Proxy validation concurrency check limit (default: 800)
   -w, --workers <number>     Number of Pico CPU worker threads to utilize for validation (default: your system CPU count)
   -t, --timeout <ms>         Validation socket timeout in milliseconds (default: 7000)
   -p, --protocol <type>      Force strictly ONE protocol check to massively speed up yields. (Choices: "all", "http", "https", "socks4", "socks5" | default: "all")

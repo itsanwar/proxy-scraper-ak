@@ -12,6 +12,7 @@ import { logger } from './utils/logger.js';
 import { collectAllProxies } from './core/collector.js';
 import { ProxyValidator } from './core/validator.js';
 import { ProxyPipeline } from './core/pipeline.js';
+import { ApiServer } from './api/server.js';
 import { program } from 'commander';
 
 program
@@ -27,9 +28,13 @@ program
     .option('-o, --output <path>', 'Custom directory to save validated proxies (default: "sproxies")')
     .option('-l, --loop', 'Run the scraper in an infinite loop (default: false)')
     .option('--nocache', 'Disable scraping cache to force fresh fetches on every loop')
+    .option('-D, --serve', 'Host an Asynchronous REST API Server to distribute scraped files globally (default: false)')
+    .option('--port <number>', 'Bind the API Server to a specific port (default: 9090)')
+    .option('--key <string>', 'Zero-Trust Authentication Key for the API Server (default: "akscraper")')
     .addHelpText('after', `
 Examples:
   $ akscraper -l             Runs the scraper continuously in a loop
+  $ akscraper --serve        Spins up the REST API Proxy File Server alongside scanning
   $ akscraper -p http        Restricts validation strictly to HTTP proxies (skips SOCKS)
   $ akscraper -c 50          Forces Scraper Concurrency to 50
   $ akscraper -w 12          Forces Piscina Worker Threads to 12
@@ -52,6 +57,12 @@ if (options.timeout) {
     config.engine.scrapeTimeoutMs = tMs;
     config.validation.checkTimeoutMs = tMs;
 }
+
+// API Server logic
+let globalApiServer = null;
+const isServing = options.serve === true;
+const servePort = options.port ? parseInt(options.port, 10) : 9090;
+const serveKey = options.key || 'akscraper';
 
 const sourcesPath = path.resolve(process.cwd(), options.sources);
 const blacklistPath = path.resolve(process.cwd(), 'config', 'blacklist.json');
@@ -149,6 +160,11 @@ function render() {
     const vConcCfg = config.validation.checkConcurrency;
     const timeCfg = config.validation.checkTimeoutMs + 'ms';
     output += `   ${chalk.cyan('Protocol:')} ${chalk.white(protoCfg)} ${chalk.dim('•')} ${chalk.cyan('Workers:')} ${chalk.white(workCfg)} ${chalk.dim('•')} ${chalk.cyan('Val Conc:')} ${chalk.white(vConcCfg)} ${chalk.dim('•')} ${chalk.cyan('Timeout:')} ${chalk.white(timeCfg)}\n`;
+
+    if (isServing && globalApiServer) {
+        output += `   ${chalk.magenta('API Server:')} ${chalk.green(`http://0.0.0.0:${servePort}`)} ${chalk.dim('•')} ${chalk.magenta('Key:')} ${chalk.white(serveKey)}\n`;
+    }
+
     output += chalk.dim('─────────────────────────────────────────────────────────────\n\n');
 
     if (state.fatalError) {
@@ -373,6 +389,16 @@ async function scrapeCycle() {
 }
 
 async function main() {
+    if (isServing && !globalApiServer) {
+        globalApiServer = new ApiServer(config.output.folderName, servePort, serveKey);
+        try {
+            await globalApiServer.start();
+        } catch (err) {
+            console.error(chalk.red(`\n✖ Fatal Error: Failed to start API Server on port ${servePort}. Is the port already in use?`));
+            process.exit(1);
+        }
+    }
+
     do {
         await scrapeCycle();
         if (config.engine.loop) {

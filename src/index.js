@@ -110,7 +110,7 @@ const state = {
     isActive: true,
     scrape: { current: 0, total: 0, found: 0, active: 0, dead: 0 },
     validate: { current: 0, total: 0, alive: 0, dead: 0 },
-    errors: [],
+    logs: [],
     spinnerFrame: 0,
     times: {
         totalStart: Date.now(),
@@ -195,16 +195,21 @@ function render() {
         sLine += '\n';
         sLine += `     └─ ${chalk.green(`Active: ${state.scrape.active}`)} | ${chalk.red(`Dead: ${state.scrape.dead}`)}`;
 
-        if (state.errors.length > 0 && state.phase === 'Scraping Sources') {
+        if (state.logs.length > 0 && state.phase === 'Scraping Sources') {
             sLine += '\n';
-            const displayErrors = state.errors.slice(-3);
-            displayErrors.forEach((err) => {
-                let msg = err.message.replace(/\r?\n|\r/g, ' '); // Strip physical newlines
+            const displayLogs = state.logs.slice(-3);
+            displayLogs.forEach((log) => {
+                let msg = log.text.replace(/\r?\n|\r/g, ' '); // Strip physical newlines
                 if (msg.length > 80) msg = msg.substring(0, 77) + '...'; // Clamp string to prevent visual line wrap
-                sLine += chalk.red(`     └─ Error: ${msg}`) + '\n';
+
+                if (log.type === 'error') {
+                    sLine += chalk.red(`     └─ ${msg}`) + '\n';
+                } else {
+                    sLine += chalk.green(`     └─ ${msg}`) + '\n';
+                }
             });
-            if (state.errors.length > 3) {
-                sLine += chalk.dim(`     └─ ...and ${state.errors.length - 3} more errors (see logs/)`);
+            if (state.logs.length > 3) {
+                sLine += chalk.dim(`     └─ ...and ${state.logs.length - 3} more logs`);
             }
         }
     } else {
@@ -286,7 +291,7 @@ function resetState() {
     state.isActive = true;
     state.scrape = { current: 0, total: 0, found: 0, active: 0, dead: 0 };
     state.validate = { current: 0, total: 0, alive: 0, dead: 0 };
-    state.errors = [];
+    state.logs = [];
     state.spinnerFrame = 0;
     state.times = {
         totalStart: Date.now(),
@@ -322,8 +327,8 @@ async function scrapeCycle() {
             state.scrape.active = active;
             state.scrape.dead = dead;
         },
-        (url, msg) => {
-            state.errors.push({ url, message: msg });
+        (logPayload) => {
+            state.logs.push(logPayload);
         }
     );
 

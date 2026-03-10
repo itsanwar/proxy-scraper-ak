@@ -6,10 +6,12 @@ import config from '../../config/default.js';
 
 const cache = new Map();
 
-export async function scrapeUrl(url, onError) {
+export async function scrapeUrl(url, onLog) {
     if (!config.engine.noCache && cache.has(url)) {
         logger.debug(`Cache hit for ${url}`);
-        return cache.get(url);
+        const proxies = cache.get(url);
+        onLog?.({ type: 'success', text: `Success: 200 (CACHE) : ${url} (Found: ${proxies.length})` });
+        return proxies;
     }
 
     try {
@@ -34,15 +36,24 @@ export async function scrapeUrl(url, onError) {
         const proxies = parseProxies(response.body);
         cache.set(url, proxies);
         logger.debug(`Scraped ${proxies.length} proxies from ${url}`);
+        onLog?.({ type: 'success', text: `Success: ${response.statusCode} (${response.statusMessage || 'OK'}) : ${url} (Found: ${proxies.length})` });
         return proxies;
     } catch (error) {
         logger.error(`Failed to scrape ${url} - ${error.message}`);
-        onError?.(url, error.message);
+        let errMsg = 'Unknown Error';
+        if (error.response) {
+            errMsg = `${error.response.statusCode} (${error.response.statusMessage || 'Not Found'})`;
+        } else if (error.code) {
+            errMsg = error.code;
+        } else if (error.message) {
+            errMsg = error.message;
+        }
+        onLog?.({ type: 'error', text: `Error: ${errMsg} : ${url}` });
         return [];
     }
 }
 
-export async function collectAllProxies(urls, onProgress, onError) {
+export async function collectAllProxies(urls, onProgress, onLog) {
     logger.info(`[Collector] Starting proxy collection from ${urls.length} sources with concurrency ${config.engine.scrapingConcurrency}...`);
 
     const allProxies = new Set();
@@ -55,9 +66,9 @@ export async function collectAllProxies(urls, onProgress, onError) {
 
     const results = await pMap(urls, async (url) => {
         let isDead = false;
-        const proxies = await scrapeUrl(url, (errUrl, msg) => {
-            isDead = true;
-            onError?.(errUrl, msg);
+        const proxies = await scrapeUrl(url, (logPayload) => {
+            if (logPayload.type === 'error') isDead = true;
+            onLog?.(logPayload);
         });
 
         if (isDead) {

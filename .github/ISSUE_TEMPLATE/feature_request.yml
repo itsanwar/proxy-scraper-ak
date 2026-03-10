@@ -1,0 +1,41 @@
+name: 💡 Feature Request
+description: Suggest an enhancement or new expert-level capability for the proxy engine.
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the proxy infrastructure. Please clearly explain your idea and the core problem it solves!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a specific problem?
+      description: A clear and concise description of what the limitation is. Ex. I'm always frustrated when [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the proposed solution
+      description: A clear and concise pipeline detailing what you want to happen and how it could be implemented in the architecture.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe any alternatives you've considered
+      description: Is there another way to achieve this using current features or CLI flags?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any mockups, screenshots, or theoretical execution flows here.
+    validations:
+      required: false

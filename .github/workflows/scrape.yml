@@ -1,0 +1,48 @@
+name: Proxy Pipeline Automator (Netlify Bypass)
+
+on:
+    schedule:
+        # Run every 4 hours automatically to bypass Netlify's 15-minute timeout
+        - cron: "0 */4 * * *"
+
+    # Allow manual trigger from the GitHub Actions tab
+    workflow_dispatch:
+
+jobs:
+    scrape-and-deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js Environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "npm"
+
+            - name: Install Engine Dependencies
+              run: npm ci
+
+            - name: Execute High-Concurrency Proxy Scraper
+              # Run aggressively on the GitHub Cloud Runner for a fast 15min yield
+              # --noserve prevents the API port binding from freezing the exit code
+              run: node src/index.js -w 50 -c 100 --noserve
+
+            - name: Commit Validated Proxies to Repository
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action Bot"
+                  # Only add the sproxies physical output directory
+                  git add sproxies/
+
+                  # Only commit if there are physical changes to the valid hit lists
+                  if git diff --staged --quiet; then
+                    echo "No new valid proxies found. Skipping commit."
+                  else
+                    git commit -m "chore(data): auto-update validated proxy pools 🚀"
+                    git push origin main
+                  fi

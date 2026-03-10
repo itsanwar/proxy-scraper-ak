@@ -63,9 +63,10 @@ Options:
   -o, --output <path>        Custom directory path to save validated proxies (default: "sproxies")
   -l, --loop                 Enable infinite looping mode. Automatically restarts scraping endlessly.
   --nocache                  Bypass source cache and force raw HTTP fetching on every cycle.
-  -D, --serve                Spin up an Asynchronous REST API Server to stream 'sproxies/' results globally (default: false)
+  -F, --nofilter             Disable GeoIP Country filtering during output generation (default: false)
+  -D, --noserve              Disable the Asynchronous REST API Server (API is ON by default)
   --port <number>            Bind the API Server to a specific IPv4 logical port (default: 9090)
-  --key <string>             Zero-Trust Authentication Token required to access the API (default: "akscraper")
+  --key <string>             Zero-Trust Authentication Token required to access the API (default: random 12-char hex string)
   -h, --help                 Display all available commands.
 ```
 
@@ -86,13 +87,14 @@ akscraper -s links.txt -o ./production_proxies -l --nocache
 ---
 
 ## 🌎 Asynchronous REST API Server
-You can host a native, zero-trust API that broadcasts your validated proxies to the entire world (or just your internal services) simultaneously while the scraper runs.
+The application hosts a native, zero-trust API server strictly on port `9090` by default. This API broadcasts your validated proxy metrics and raw datasets efficiently to external dashboards and clients remotely around the globe, updating concurrently as new results hit the output folder.
 
 ```bash
-akscraper --serve --port 8080 --key mysecret
+# Overriding the port and assigning a custom key
+akscraper --port 8080 --key mysecret
 ```
 
-Once tracking, any external client can grab your live proxies securely using your provided API key:
+Because the server natively spins up instantly on launch, the engine will spit out an inherently `random` API key string to your console header unless manually passed. External clients use exactly that key string to pull:
 
 ```bash
 # Example: Fetching the master ALL.txt proxy sheet 

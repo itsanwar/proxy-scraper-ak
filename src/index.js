@@ -2,6 +2,7 @@
 process.env.UV_THREADPOOL_SIZE = Math.max(128, parseInt(process.env.UV_THREADPOOL_SIZE || '128', 10)).toString();
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import chalk from 'chalk';
 import boxen from 'boxen';
 import logUpdate from 'log-update';
@@ -28,13 +29,14 @@ program
     .option('-o, --output <path>', 'Custom directory to save validated proxies (default: "sproxies")')
     .option('-l, --loop', 'Run the scraper in an infinite loop (default: false)')
     .option('--nocache', 'Disable scraping cache to force fresh fetches on every loop')
-    .option('-D, --serve', 'Host an Asynchronous REST API Server to distribute scraped files globally (default: false)')
+    .option('-F, --nofilter', 'Disable GeoIP Country filtering during output generation (default: false)')
+    .option('-D, --noserve', 'Disable the Asynchronous REST API Server (API is ON by default)')
     .option('--port <number>', 'Bind the API Server to a specific port (default: 9090)')
-    .option('--key <string>', 'Zero-Trust Authentication Key for the API Server (default: "akscraper")')
+    .option('--key <string>', 'Zero-Trust Authentication Key for the API Server (default: random 12-char string)')
     .addHelpText('after', `
 Examples:
   $ akscraper -l             Runs the scraper continuously in a loop
-  $ akscraper --serve        Spins up the REST API Proxy File Server alongside scanning
+  $ akscraper --noserve      Disables the REST API Proxy File Server
   $ akscraper -p http        Restricts validation strictly to HTTP proxies (skips SOCKS)
   $ akscraper -c 50          Forces Scraper Concurrency to 50
   $ akscraper -w 12          Forces Piscina Worker Threads to 12
@@ -57,12 +59,13 @@ if (options.timeout) {
     config.engine.scrapeTimeoutMs = tMs;
     config.validation.checkTimeoutMs = tMs;
 }
+if (options.nofilter) config.output.filterByCountry = false;
 
 // API Server logic
 let globalApiServer = null;
-const isServing = options.serve === true;
+const isServing = !options.noserve;
 const servePort = options.port ? parseInt(options.port, 10) : 9090;
-const serveKey = options.key || 'akscraper';
+const serveKey = options.key || crypto.randomBytes(6).toString('hex');
 
 const sourcesPath = path.resolve(process.cwd(), options.sources);
 const blacklistPath = path.resolve(process.cwd(), 'config', 'blacklist.json');

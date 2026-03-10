@@ -65,8 +65,21 @@ try {
         urls = fileContent.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0 && !line.startsWith('#'));
     }
 } catch (err) {
-    console.error(chalk.red(`✖ Failed to read sources file: ${sourcesPath}`));
-    process.exit(1);
+    console.error(chalk.red(`\n✖ Fatal Error: The proxy sources file was not found!`));
+    console.error(chalk.yellow(`  Looking for: `) + chalk.white(sourcesPath));
+    console.error(chalk.cyan(`  Please create this file and add your proxy URLs (one per line).`));
+    console.error(chalk.cyan(`  Or specify a different file using the -s argument.\n`));
+
+    if (process.stdin.isTTY) {
+        process.stdout.write(chalk.gray(`  Press any key to exit...`));
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+        process.stdin.once('data', () => process.exit(1));
+    } else {
+        process.exit(1);
+    }
+    // Block the main thread from proceeding
+    await new Promise(() => { });
 }
 
 let blacklist = new Set();

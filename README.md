@@ -63,6 +63,9 @@ Options:
   -o, --output <path>        Custom directory path to save validated proxies (default: "sproxies")
   -l, --loop                 Enable infinite looping mode. Automatically restarts scraping endlessly.
   --nocache                  Bypass source cache and force raw HTTP fetching on every cycle.
+  -D, --serve                Spin up an Asynchronous REST API Server to stream 'sproxies/' results globally (default: false)
+  --port <number>            Bind the API Server to a specific IPv4 logical port (default: 9090)
+  --key <string>             Zero-Trust Authentication Token required to access the API (default: "akscraper")
   -h, --help                 Display all available commands.
 ```
 
@@ -78,6 +81,25 @@ akscraper -s sources.txt -p http -w 80
 Force the scraper to run indefinitely in an endless loop, clearing its physical cache map on every single iteration to ensure the freshest proxies are constantly piped into your targeted server export layout architecture.
 ```bash
 akscraper -s links.txt -o ./production_proxies -l --nocache
+```
+
+---
+
+## 🌎 Asynchronous REST API Server
+You can host a native, zero-trust API that broadcasts your validated proxies to the entire world (or just your internal services) simultaneously while the scraper runs.
+
+```bash
+akscraper --serve --port 8080 --key mysecret
+```
+
+Once tracking, any external client can grab your live proxies securely using your provided API key:
+
+```bash
+# Example: Fetching the master ALL.txt proxy sheet 
+curl "http://[YOUR_SERVER_IP]:8080/ALL.txt?apikey=mysecret"
+
+# Example: Fetching strictly the SOCKS5 list
+curl "http://[YOUR_SERVER_IP]:8080/SOCKS5.txt?apikey=mysecret"
 ```
 
 ---

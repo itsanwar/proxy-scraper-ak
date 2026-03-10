@@ -10,7 +10,7 @@ export async function scrapeUrl(url, onLog) {
     if (!config.engine.noCache && cache.has(url)) {
         logger.debug(`Cache hit for ${url}`);
         const proxies = cache.get(url);
-        onLog?.({ type: 'success', text: `Success: 200 (CACHE) : ${url} (Found: ${proxies.length})` });
+        onLog?.({ type: 'success', text: `Success: 200 (${proxies.length} Found - CACHE) : ${url}` });
         return proxies;
     }
 
@@ -36,7 +36,8 @@ export async function scrapeUrl(url, onLog) {
         const proxies = parseProxies(response.body);
         cache.set(url, proxies);
         logger.debug(`Scraped ${proxies.length} proxies from ${url}`);
-        onLog?.({ type: 'success', text: `Success: ${response.statusCode} (${response.statusMessage || 'OK'}) : ${url} (Found: ${proxies.length})` });
+        const status = response.statusCode || 200;
+        onLog?.({ type: 'success', text: `Success: ${status} (${proxies.length} Found) : ${url}` });
         return proxies;
     } catch (error) {
         logger.error(`Failed to scrape ${url} - ${error.message}`);

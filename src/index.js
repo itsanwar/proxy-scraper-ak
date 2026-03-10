@@ -20,7 +20,7 @@ program
     .name('akscraper')
     .description('High-Performance Asynchronous Node.js Proxy Scraper')
     .version('2.0.0')
-    .option('-s, --sources <path>', 'Path to sources file (.txt or .json)', 'config/sources.json')
+    .option('-s, --sources <path>', 'Path to sources file (.txt or .json)', 'links.txt')
     .option('-c, --concurrency <number>', 'Concurrent sources to scrape simultaneously (default: 20)')
     .option('-v, --vconcurrency <number>', 'Concurrent proxies to validate simultaneously (default: 800)')
     .option('-w, --workers <number>', 'Number of validation worker threads (default: system logical threads)')
